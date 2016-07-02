@@ -1,0 +1,12 @@
+use_frameworks!
+
+target 'BGMKit_Example' do
+  pod 'BGMKit', :path => '../'
+
+  target 'BGMKit_Tests' do
+    inherit! :search_paths
+
+    pod 'Specta'
+  pod 'Expecta'
+  end
+end

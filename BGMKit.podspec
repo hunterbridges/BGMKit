@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'BGMKit'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of BGMKit.'
+  s.summary          = 'Configurable OGG music loops for iOS applications.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,15 +18,14 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+The fun and quirky way to play music in your app.
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/BGMKit'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+  s.homepage         = 'https://github.com/hunterbridges/BGMKit'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Hunter Bridges' => 'hbridges@gmail.com' }
-  s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/BGMKit.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => 'https://github.com/hunterbridges/BGMKit.git', :tag => s.version.to_s }
+  s.social_media_url = 'https://twitter.com/hunterbridges'
 
   s.ios.deployment_target = '8.0'
 
@@ -36,7 +35,11 @@ TODO: Add long description of the pod here.
   #   'BGMKit' => ['BGMKit/Assets/*.png']
   # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
+  s.xcconfig = {
+    'HEADER_SEARCH_PATHS' => '"Pod/include/**/*.h"',
+    'USER_HEADER_SEARCH_PATHS' => '"Pod/include/**/*.h"'
+  }
+  s.public_header_files = 'Pod/Classes/**/*.h'
+  s.frameworks = 'AVFoundation', 'AudioQueue', 'AudioToolbox'
   # s.dependency 'AFNetworking', '~> 2.3'
 end

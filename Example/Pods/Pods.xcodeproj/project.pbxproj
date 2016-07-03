@@ -161,10 +161,12 @@
 		C12A2C921D2887BC00AE8EC2 /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C3E1D28824000AE8EC2 /* sharedbook.c */; };
 		C12A2C931D2887C500AE8EC2 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2BF71D28815A00AE8EC2 /* framing.c */; };
 		C12A2C941D2887C800AE8EC2 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2BF61D28815A00AE8EC2 /* bitwise.c */; };
-		C12A2C971D2887F500AE8EC2 /* BGMOggMusicPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C951D2887F500AE8EC2 /* BGMOggMusicPlayer.h */; };
+		C12A2C971D2887F500AE8EC2 /* BGMOggMusicPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C951D2887F500AE8EC2 /* BGMOggMusicPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C12A2C981D2887F500AE8EC2 /* BGMOggMusicPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C961D2887F500AE8EC2 /* BGMOggMusicPlayer.m */; };
-		C12A2C9B1D2888A000AE8EC2 /* BGMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C991D2888A000AE8EC2 /* BGMManager.h */; };
+		C12A2C9B1D2888A000AE8EC2 /* BGMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C991D2888A000AE8EC2 /* BGMManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C12A2C9C1D2888A000AE8EC2 /* BGMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C9A1D2888A000AE8EC2 /* BGMManager.m */; };
+		C12A2C9F1D288A1100AE8EC2 /* BGMTrackDefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C9D1D288A1100AE8EC2 /* BGMTrackDefinition.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C12A2CA01D288A1100AE8EC2 /* BGMTrackDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C9E1D288A1100AE8EC2 /* BGMTrackDefinition.m */; };
 		C813A47573B85547722C3DF72E5A0EE8 /* Pods-BGMKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFCD658F7A3C708D34F4DFA2C7899A /* Pods-BGMKit_Tests-dummy.m */; };
 		C9FC834ACE4C5CC26CE1B0576C03136C /* SpectaDSL.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D45D57ACA8E38D852A1E07D2AD679 /* SpectaDSL.m */; };
 		CE3F4ECBB0BC095577D66AE50C8E604C /* EXPFloatTuple.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4CBA4D2825ED03DE841CB750862190 /* EXPFloatTuple.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -410,6 +412,8 @@
 		C12A2C961D2887F500AE8EC2 /* BGMOggMusicPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BGMOggMusicPlayer.m; sourceTree = "<group>"; };
 		C12A2C991D2888A000AE8EC2 /* BGMManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGMManager.h; sourceTree = "<group>"; };
 		C12A2C9A1D2888A000AE8EC2 /* BGMManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BGMManager.m; sourceTree = "<group>"; };
+		C12A2C9D1D288A1100AE8EC2 /* BGMTrackDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BGMTrackDefinition.h; sourceTree = "<group>"; };
+		C12A2C9E1D288A1100AE8EC2 /* BGMTrackDefinition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BGMTrackDefinition.m; sourceTree = "<group>"; };
 		C2D5F98443188468F5CFE556EC251738 /* XCTestCase+Specta.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "XCTestCase+Specta.h"; path = "Specta/Specta/XCTestCase+Specta.h"; sourceTree = "<group>"; };
 		C7A1FE2006A967BE06886C450214BDFE /* SpectaUtility.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SpectaUtility.h; path = Specta/Specta/SpectaUtility.h; sourceTree = "<group>"; };
 		C7B5A923D27207113E5B55FE0DACDAD9 /* EXPMatchers+conformTo.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "EXPMatchers+conformTo.h"; path = "Expecta/Matchers/EXPMatchers+conformTo.h"; sourceTree = "<group>"; };
@@ -708,6 +712,8 @@
 				C12A2C961D2887F500AE8EC2 /* BGMOggMusicPlayer.m */,
 				C12A2C991D2888A000AE8EC2 /* BGMManager.h */,
 				C12A2C9A1D2888A000AE8EC2 /* BGMManager.m */,
+				C12A2C9D1D288A1100AE8EC2 /* BGMTrackDefinition.h */,
+				C12A2C9E1D288A1100AE8EC2 /* BGMTrackDefinition.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1036,6 +1042,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C12A2C9F1D288A1100AE8EC2 /* BGMTrackDefinition.h in Headers */,
 				C12A2C661D28824000AE8EC2 /* floor_all.h in Headers */,
 				C12A2C731D28824000AE8EC2 /* setup_32.h in Headers */,
 				C12A2C6E1D28824000AE8EC2 /* residue_44u.h in Headers */,
@@ -1249,6 +1256,7 @@
 				C12A2C471D28824000AE8EC2 /* analysis.c in Sources */,
 				C12A2C511D28824000AE8EC2 /* codebook.c in Sources */,
 				C12A2C7D1D28824000AE8EC2 /* registry.c in Sources */,
+				C12A2CA01D288A1100AE8EC2 /* BGMTrackDefinition.m in Sources */,
 				C12A2C631D28824000AE8EC2 /* mdct.c in Sources */,
 				C12A2C941D2887C800AE8EC2 /* bitwise.c in Sources */,
 				C12A2C881D28824000AE8EC2 /* window.c in Sources */,

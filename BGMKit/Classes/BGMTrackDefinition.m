@@ -41,4 +41,18 @@
   return [self initWithIntroName:nil loopName:loop];
 }
 
+#pragma mark - NSObject
+
+- (BOOL)isEqual:(id)object
+{
+  if ([object isKindOfClass:[BGMTrackDefinition class]]) {
+    BGMTrackDefinition *def = (BGMTrackDefinition *)object;
+    BOOL loopsMatch = [def.loopName isEqualToString:self.loopName];
+    BOOL introsMatch = ((def.introName == nil && self.introName == nil) ||
+                        [def.introName isEqualToString:self.introName]);
+    return introsMatch && loopsMatch;
+  }
+  return NO;
+}
+
 @end

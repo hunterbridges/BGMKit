@@ -24,17 +24,19 @@
 @property (atomic, assign) BOOL duck;
 
 /// The level to duck music to. Defaults to 0.3.
-@property (nonatomic, assign) BOOL duckingLevel;
+@property (nonatomic, assign) double duckingLevel;
 
 @property (atomic, assign) double masterVolume;
+
+@property (nonatomic, assign) BOOL fadeInNewTracks;
 
 /// The singleton BGMManager object.
 + (instancetype)sharedInstance;
 
 /// Play a BGM track defined by the provided track definition.
-- (void)play:(BGMTrackDefinition *)toPlay;
+- (void)play:(BGMTrackDefinition *)toPlay completion:(void (^)())completion;
 
 /// Stop the current music.
-- (void)stop;
+- (void)stopWithCompletion:(void (^)())completion;
 
 @end

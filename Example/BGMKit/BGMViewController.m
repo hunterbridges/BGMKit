@@ -34,13 +34,8 @@
   
   BGMTrackDefinition *finalBoss = [[BGMTrackDefinition alloc] initWithIntroName:@"FinalBoss_Intro"
                                                                        loopName:@"FinalBoss_Loop"];
+  finalBoss.baseVolume = 0.5; // This track is loud af lol
   self.introLoopTrack = finalBoss;
-}
-
-- (void)didReceiveMemoryWarning
-{
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Private
@@ -58,29 +53,39 @@
 - (IBAction)basicLoopPressed:(id)sender {
   BGMManager *manager = [BGMManager sharedInstance];
   if (manager.isPlaying) {
-    if (manager.currentTrack == self.basicLoopTrack) {
-      [manager stop];
+    if ([manager.currentTrack isEqual:self.basicLoopTrack]) {
+      [manager stopWithCompletion:^{
+        [self updateInterface];
+      }];
     } else {
-      [manager play:self.basicLoopTrack];
+      [manager play:self.basicLoopTrack completion:^{
+        [self updateInterface];
+      }];
     }
   } else {
-    [manager play:self.basicLoopTrack];
+    [manager play:self.basicLoopTrack completion:^{
+      [self updateInterface];
+    }];
   }
-  [self updateInterface];
 }
 
 - (IBAction)introLoopPressed:(id)sender {
   BGMManager *manager = [BGMManager sharedInstance];
   if (manager.isPlaying) {
-    if (manager.currentTrack == self.introLoopTrack) {
-      [manager stop];
+    if ([manager.currentTrack isEqual:self.introLoopTrack]) {
+      [manager stopWithCompletion:^{
+        [self updateInterface];
+      }];
     } else {
-      [manager play:self.introLoopTrack];
+      [manager play:self.introLoopTrack completion:^{
+        [self updateInterface];
+      }];
     }
   } else {
-    [manager play:self.introLoopTrack];
+    [manager play:self.introLoopTrack completion:^{
+      [self updateInterface];
+    }];
   }
-  [self updateInterface];
 }
 
 - (IBAction)mutePressed:(id)sender {
@@ -95,9 +100,9 @@
   [self updateInterface];
 }
 
-- (IBAction)volumeSliderChanged:(id)sender {
+- (IBAction)volumeSliderChanged:(UISlider *)sender {
   BGMManager *manager = [BGMManager sharedInstance];
-  manager.masterVolume = [sender doubleValue];
+  manager.masterVolume = sender.value;
 }
 
 @end

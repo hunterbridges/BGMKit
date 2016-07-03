@@ -8,12 +8,15 @@
 
 #import "BGMAppDelegate.h"
 
+@import AVFoundation;
+
 @implementation BGMAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
-    return YES;
+  // Override point for customization after application launch.
+  [[AVAudioSession sharedInstance] setActive:YES error:nil];
+  return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

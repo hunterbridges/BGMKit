@@ -8,9 +8,10 @@
 #import "BGMOggMusicPlayer.h"
 
 static const size_t kOggBufferCount = 3;
-static const size_t kOggBufferSize = 1024 * 32;
+static const size_t kOggBufferFrameCapacity = 1024 * 32;
 static const size_t kOggChannels = 2;
-static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
+static const size_t kOggBufferSize = kOggBufferFrameCapacity * kOggChannels * sizeof(Float32);
+static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float32);
 
 @import AVFoundation;
 
@@ -24,6 +25,11 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
   OggVorbis_File _stream;
   vorbis_info *_vorbisInfo;
   vorbis_comment *_vorbisComment;
+  
+  AudioQueueRef _outputQueue;
+  AudioQueueBufferRef _buffers[kOggBufferCount];
+  int _nextBufferToFill;
+  int _enqueuedBufferCount;
 }
 
 @property (nonatomic, copy, readwrite) NSString *oggName;
@@ -32,15 +38,9 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
 
 @property (nonatomic, assign) BOOL initialized;
 
-@property (nonatomic, strong) AVAudioEngine *engine;
-@property (nonatomic, strong) AVAudioPlayerNode *playerNode;
-@property (nonatomic, strong) AVAudioMixerNode *mixerNode;
 @property (atomic, assign) int queueCount;
-@property (nonatomic, strong) NSMutableArray *bufferQueue;
-@property (nonatomic, strong) NSMutableArray *processedBuffers;
 
-@property (nonatomic, strong) NSThread *decoderThread;
-@property (nonatomic, strong) NSCondition *endCondition;
+@property (nonatomic, strong) NSLock *outputLock;
 @property (nonatomic, assign) BOOL eof;
 
 @property (nonatomic, strong) CADisplayLink *fadeLink;
@@ -79,7 +79,6 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
 
 - (void)play
 {
-  self.isPlaying = YES;
   if (!self.initialized) {
     [self initialize];
   }
@@ -87,20 +86,26 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
 
 - (void)stop
 {
-  [self.playerNode stop];
-  [self.engine stop];
-  [self.decoderThread cancel];
-  [self.endCondition wait];
-  [self.endCondition unlock];
+  if (!_outputQueue) {
+    return;
+  }
   
-  self.engine = nil;
-  self.playerNode = nil;
-  self.mixerNode = nil;
+  AudioQueueStop(_outputQueue, false);
+  
   self.queueCount = 0;
+  
+  _enqueuedBufferCount = 0;
+  _nextBufferToFill = 0;
+  for (int i=0; i < kOggBufferCount; i++) {
+    _buffers[i] = NULL;
+  }
+  AudioQueueDispose(_outputQueue, false);
+  _outputQueue = NULL;
   
   [self closeDecoder];
   
   self.initialized = NO;
+  self.isPlaying = NO;
 }
 
 - (void)pause
@@ -200,134 +205,7 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
   }
 }
 
-- (void)initialize
-{
-  self.engine = [[AVAudioEngine alloc] init];
-  self.playerNode = [[AVAudioPlayerNode alloc] init];
-  self.mixerNode = self.engine.mainMixerNode;
-  
-  [self updateVolume];
-  
-  [self.engine attachNode:self.playerNode];
-  [self.engine connect:self.playerNode to:self.mixerNode format:[self.mixerNode outputFormatForBus:0]];
-  
-  NSError *err = nil;
-  [self.engine startAndReturnError:&err];
-  if (err) {
-    NSLog(@"%@", err);
-    [NSException raise:NSInternalInconsistencyException format:@"%@", err.description, nil];
-    return;
-  }
-  
-  [self.playerNode play];
-  
-  self.bufferQueue = [NSMutableArray array];
-  self.processedBuffers = [NSMutableArray array];
-  
-  self.endCondition = [[NSCondition alloc] init];
-  [self.endCondition lock];
-  
-  self.decoderThread = [[NSThread alloc] initWithTarget:self selector:@selector(decoderThreadMain) object:nil];
-  [self.decoderThread start];
-}
-
-- (void)updateVolume
-{
-  self.mixerNode.outputVolume = self.volume * self.volCoef;
-}
-
-- (void)decoderThreadMain
-{
-  const char *filename = [self.oggPath cStringUsingEncoding:NSASCIIStringEncoding];
-  _file = fopen(filename, "rb");
-  
-  [self openDecoder];
-  
-  struct timespec tim, tim2;
-  tim.tv_sec = 0;
-  
-  while (![NSThread currentThread].isCancelled) {
-    if (self.isPlaying) {
-      while (self.queueCount < kOggBufferCount) {
-        [self enqueueNextBuffer:NULL];
-      }
-    }
-    
-    tim.tv_nsec = 10000000L;
-    nanosleep(&tim, &tim2);
-  }
-  
-  [self closeDecoder];
-  fclose(_file);
-  [self.endCondition signal];
-}
-
-- (long)enqueueNextBuffer:(size_t *)sz
-{
-  if (self.eof) {
-    [self rewind];
-    self.eof = NO;
-  }
-  
-  Float32 data[2][kOggChanBufferSize];
-  int framesRead = 0;
-  long result = 0;
-  
-  while (framesRead < kOggChanBufferSize) {
-    float **pcm;
-    result = ov_read_float(&_stream, &pcm, kOggChanBufferSize - framesRead, 0);
-    
-    if (result > 0) {
-      memcpy(data[0] + framesRead, pcm[0], result * sizeof(Float32));
-      memcpy(data[1] + framesRead, pcm[1], result * sizeof(Float32));
-      framesRead += result;
-    } else {
-      if (result < 0) {
-        NSLog(@"%@", [self oggErrorString:result]);
-        if (sz) *sz = 0;
-        return 0;
-      } else {
-        self.eof = YES;
-        break;
-      }
-    }
-  }
-  
-  if (sz) *sz = framesRead * sizeof(Float32);
-  if (framesRead == 0) {
-    return 0;
-  }
-  
-  AVAudioPCMBuffer *buffer = nil;
-  if (!buffer) {
-    AVAudioChannelLayout *chLayout = [[AVAudioChannelLayout alloc] initWithLayoutTag:kAudioChannelLayoutTag_Stereo];
-    AVAudioFormat *chFormat = [[AVAudioFormat alloc] initWithCommonFormat:AVAudioPCMFormatFloat32
-                                                               sampleRate:44100.0
-                                                              interleaved:NO
-                                                            channelLayout:chLayout];
-    buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:chFormat
-                                           frameCapacity:kOggBufferSize];
-  }
-  
-  ((AudioBuffer *)&buffer.audioBufferList->mBuffers[0])->mDataByteSize = sizeof(Float32);
-  ((AudioBuffer *)&buffer.audioBufferList->mBuffers[1])->mDataByteSize = sizeof(Float32);
-  
-  for (int i = 0; i < framesRead; i++) {
-    Float32 l = data[0][i];
-    Float32 r = data[1][i];
-    ((Float32 *)buffer.audioBufferList->mBuffers[0].mData)[i] = l;
-    ((Float32 *)buffer.audioBufferList->mBuffers[1].mData)[i] = r;
-  }
-  buffer.frameLength = framesRead;
-  self.queueCount++;
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self.playerNode scheduleBuffer:buffer atTime:nil options:0 completionHandler:^{
-      self.queueCount--;
-    }];
-  });
-  
-  return result;
-}
+#pragma mark - Stream Management
 
 - (void)openDecoder
 {
@@ -371,6 +249,180 @@ static const size_t kOggChanBufferSize = kOggBufferSize / kOggChannels;
     default:
       return @"Unknown OGG error.";
   }
+}
+
+- (void)updateVolume
+{
+  if (!_outputQueue) {
+    return;
+  }
+  
+  double finalVolume = self.volume * self.volCoef;
+  AudioQueueSetParameter(_outputQueue, kAudioQueueParam_Volume, finalVolume);
+}
+
+// TODO: Migrate to AudioQueue
+void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+  BGMOggMusicPlayer *player = (__bridge BGMOggMusicPlayer*) inUserData;
+  [player processOutputBuffer:inBuffer queue:inAQ];
+}
+
+- (void) processOutputBuffer:(AudioQueueBufferRef)buffer queue:(AudioQueueRef)queue {
+  OSStatus err;
+  if (self.isPlaying == YES) {
+    [self.outputLock lock];
+    // if (_enqueuedBufferCount < kOggBufferCount) {
+    //   [self enqueueNextBuffer:&sz];
+    // }
+    size_t sz = 0;
+    [self fillBuffer:buffer outSize:&sz];
+    err = AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
+    if (err == 560030580) { // Queue is not active due to Music being started or other reasons
+      self.isPlaying = NO;
+    } else if (err == noErr) {
+      _enqueuedBufferCount++;
+    } else {
+      NSLog(@"AudioQueueEnqueueBuffer() error %d", err);
+    }
+    [self.outputLock unlock];
+  } else {
+    // err = AudioQueueStop (queue, NO);
+    // if (err != noErr) NSLog(@"AudioQueueStop() error: %d", err);
+  }
+}
+
+- (void)initialize
+{
+  // Create the env
+  OSStatus err;
+  
+  // Set up stream format fields
+  AudioStreamBasicDescription streamFormat;
+  streamFormat.mSampleRate = 44100;
+  streamFormat.mFormatID = kAudioFormatLinearPCM;
+  streamFormat.mFormatFlags = kLinearPCMFormatFlagIsFloat | kLinearPCMFormatFlagIsPacked;
+  streamFormat.mBitsPerChannel = 32;
+  streamFormat.mChannelsPerFrame = 2;
+  streamFormat.mBytesPerPacket = 4 * streamFormat.mChannelsPerFrame;
+  streamFormat.mBytesPerFrame = 4 * streamFormat.mChannelsPerFrame;
+  streamFormat.mFramesPerPacket = 1;
+  streamFormat.mReserved = 0;
+  
+  [self updateVolume];
+  
+  // Start queue
+  self.outputLock = [[NSLock alloc] init];
+  
+  const char *filename = [self.oggPath cStringUsingEncoding:NSASCIIStringEncoding];
+  _file = fopen(filename, "rb");
+  [self openDecoder];
+  
+  if (self.isPlaying == NO) {
+    self.isPlaying = YES;
+    AudioQueueRef outputQueue = NULL;
+    err = AudioQueueNewOutput (&streamFormat, AudioEngineOutputBufferCallback, (__bridge void *)self, nil, nil, 0, &outputQueue);
+    if (err != noErr) NSLog(@"AudioQueueNewOutput() error: %d", err);
+    _outputQueue = outputQueue;
+    
+    // Enqueue buffers
+    _enqueuedBufferCount = 0;
+    _nextBufferToFill = 0;
+    for (int i=0; i < kOggBufferCount; i++) {
+      err = AudioQueueAllocateBufferWithPacketDescriptions(outputQueue, kOggBufferSize, kOggBufferFrameCapacity, &_buffers[i]);
+      if (err == noErr) {
+        AudioEngineOutputBufferCallback((__bridge void *)self, outputQueue, _buffers[i]);
+      } else {
+        NSLog(@"AudioQueueAllocateBuffer() error: %d", err);
+        return;
+      }
+    }
+    
+    // Start playback
+    err = AudioQueueStart(outputQueue, nil);
+    if (err != noErr) {
+      NSLog(@"AudioQueueStart() error: %d", err);
+      self.isPlaying= NO;
+      return;
+    }
+  } else {
+    NSLog (@"Error: audio is already playing back.");
+  }
+}
+
+- (OSStatus)fillBuffer:(AudioQueueBufferRef)buffer outSize:(size_t *)sz
+{
+  // Is this doing anything?
+  int bufferIndex = _nextBufferToFill++;
+  if (_nextBufferToFill >= kOggBufferCount) {
+    _nextBufferToFill = 0;
+  }
+  
+  // TODO handle more gracefully for intros and 1-shots
+  if (self.eof) {
+    [self rewind];
+    self.eof = NO;
+  }
+  
+  // Read out of OGG decoder
+  Float32 data[2][kOggBufferFrameCapacity];
+  long chanFrames = kOggBufferFrameCapacity;
+  int framesRead = 0;
+  long result = 0;
+  
+  while (framesRead < kOggBufferFrameCapacity) {
+    float **pcm;
+    result = ov_read_float(&_stream, &pcm, kOggBufferFrameCapacity - framesRead, 0);
+    
+    if (result > 0) {
+      for (int i = 0; i < result; i++) {
+        data[0][framesRead + i] = pcm[0][i];
+        data[1][framesRead + i] = pcm[1][i];
+      }
+      // memcpy(data[0] + framesRead, pcm[0], result * sizeof(Float32));
+      // memcpy(data[1] + framesRead, pcm[1], result * sizeof(Float32));
+      framesRead += result;
+    } else {
+      if (result < 0) {
+        NSLog(@"%@", [self oggErrorString:result]);
+        if (sz) *sz = 0;
+        return 0;
+      } else {
+        self.eof = YES;
+        break;
+      }
+    }
+  }
+  
+  if (sz) *sz = framesRead * sizeof(Float32);
+  if (framesRead == 0) {
+    return 0;
+  }
+  
+  // Write new buffer
+  memset(buffer->mAudioData, 0, kOggBufferSize);
+  buffer->mPacketDescriptionCount = 0;
+  for (int i = 0; i < framesRead, i < kOggBufferFrameCapacity; i++) {
+    Float32 l = data[0][i];
+    Float32 r = data[1][i];
+    Float32 *outBuf = (Float32 *)buffer->mAudioData;
+    outBuf[i * 2] = l;
+    outBuf[i * 2 + 1] = r;
+    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mStartOffset = sizeof(Float32) * i * 2;
+    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mDataByteSize = sizeof(Float32) * kOggChannels;
+    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mVariableFramesInPacket = 1;
+    buffer->mAudioDataByteSize += sizeof(Float32) * kOggChannels;
+    buffer->mPacketDescriptionCount = i + 1;
+  }
+  
+  if (buffer->mPacketDescriptionCount < kOggBufferFrameCapacity) {
+    NSLog(@"Exceeded buffer capacity with stream read left over. Uh oh!");
+    [NSException raise:NSInternalInconsistencyException format:@"Exceeded buffer capacity with stream read left over. Uh oh!"];
+    return -1;
+  }
+  
+  buffer->mPacketDescriptionCount = sz;
+  
+  return noErr;
 }
 
 @end

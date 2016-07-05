@@ -29,7 +29,7 @@ The fun and quirky way to play music in your app.
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'BGMKit/{Classes,include,Ogg,Vorbis}/**/*.{h,m}'
+  s.source_files = 'BGMKit/{Classes,include,Ogg,Vorbis}/**/*.{h,m,c}'
 
   s.public_header_files = 'Pod/Classes/**/*.h'
   s.private_header_files = 'Pod/{include,Vorbis}/*.h'

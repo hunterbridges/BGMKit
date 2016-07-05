@@ -26,7 +26,7 @@ Once you have a precious OGG file, let's say for example `GoodVibes.ogg`, just
 BGMTrackDefinition *goodVibes = [[BGMTrackDefinition alloc] initWithLoopName:@"GoodVibes"];
 
 BGMManager *manager = [BGMManager sharedInstance];
-[manager play:self.introLoopTrack completion:^{
+[manager play:goodVibes completion:^{
     NSLog(@"Thank God it's Friday night and I ju- ju- ju- ju- juuuuust got played");
 }];
 ```

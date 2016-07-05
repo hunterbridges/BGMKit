@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'BGMKit'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Configurable OGG music loops for iOS applications.'
 
 # This description is used to generate tags and improve search results.
@@ -35,11 +35,8 @@ The fun and quirky way to play music in your app.
   #   'BGMKit' => ['BGMKit/Assets/*.png']
   # }
 
-  s.xcconfig = {
-    'HEADER_SEARCH_PATHS' => '"Pod/include/**/*.h"',
-    'USER_HEADER_SEARCH_PATHS' => '"Pod/include/**/*.h"'
-  }
   s.public_header_files = 'Pod/Classes/**/*.h'
+  s.private_header_files = ['Pod/include/*.h', 'Pod/Vorbis/*.h']
   s.frameworks = 'AVFoundation', 'AudioQueue', 'AudioToolbox'
   # s.dependency 'AFNetworking', '~> 2.3'
 end

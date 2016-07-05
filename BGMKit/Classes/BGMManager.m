@@ -49,16 +49,22 @@
         [self.currentPlayer stop];
         self.currentPlayer = nil;
         self.currentTrack = nil;
-        completion();
+        if (completion) {
+          completion();
+        }
       }];
     } else {
-      dispatch_async(dispatch_get_main_queue(), completion);
+      if (completion) {
+        dispatch_async(dispatch_get_main_queue(), completion);
+      }
     }
     return;
   }
   
   if ([toPlay isEqual:self.currentTrack]) {
-    dispatch_async(dispatch_get_main_queue(), completion);
+    if (completion) {
+      dispatch_async(dispatch_get_main_queue(), completion);
+    }
     return;
   }
   
@@ -80,12 +86,12 @@
     player.volCoef = 0.0;
     [player fadeTo:(self.duck ? self.duckingLevel : 1.0)
         withDuration:0.5
-        completionBlock:^{
-     
-        }];
+        completionBlock:nil];
   }
   [player play];
-  completion();
+  if (completion) {
+    completion();
+  }
 }
 
 - (void)stopWithCompletion:(void (^)())completion

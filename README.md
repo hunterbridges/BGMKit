@@ -34,8 +34,15 @@ BGMManager *manager = [BGMManager sharedInstance];
 Or if you're Taylor Swift
 
 ```swift
-// TODO Swift LOL
+let goodVibes = BGMTrackDefinition(loopName: "GoodVibes")
+
+let manager = BGMManager.sharedInstance()
+manager.play(goodVibes) {
+    print("Thank God it's Friday night and I ju- ju- ju- ju- juuuuust got played")
+}
 ```
+
+So what have you got to lose? Try my pod.
 
 ## Author
 

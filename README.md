@@ -46,7 +46,7 @@ So what have you got to lose? Try my pod.
 
 ## Author
 
-Hunter Bridges, hbridges@gmail.com
+Hunter Bridges
 
 ## License
 

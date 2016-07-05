@@ -46,12 +46,6 @@
                                     <action selector="duckPressed:" destination="whP-gf-Uak" eventType="touchUpInside" id="XDJ-oo-IPX"/>
                                 </connections>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="ks2-7s-P1b">
-                                <rect key="frame" x="26" y="218" width="548" height="31"/>
-                                <connections>
-                                    <action selector="volumeSliderChanged:" destination="whP-gf-Uak" eventType="valueChanged" id="Rg7-Il-56i"/>
-                                </connections>
-                            </slider>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4S9-ye-HCm">
                                 <rect key="frame" x="279" y="180" width="42" height="30"/>
                                 <state key="normal" title="Pause"/>
@@ -59,15 +53,30 @@
                                     <action selector="pausePressed:" destination="whP-gf-Uak" eventType="touchUpInside" id="AJb-kL-mmN"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NYg-WZ-voC">
+                                <rect key="frame" x="233" y="218" width="134" height="30"/>
+                                <state key="normal" title="Fade In New Tracks"/>
+                                <connections>
+                                    <action selector="fadeInPressed:" destination="whP-gf-Uak" eventType="touchUpInside" id="Yam-Lb-vgU"/>
+                                </connections>
+                            </button>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="ks2-7s-P1b">
+                                <rect key="frame" x="26" y="256" width="548" height="31"/>
+                                <connections>
+                                    <action selector="volumeSliderChanged:" destination="whP-gf-Uak" eventType="valueChanged" id="Rg7-Il-56i"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="ggW-pd-Qp4" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="1TG-NC-Pmx"/>
                             <constraint firstItem="ggW-pd-Qp4" firstAttribute="top" secondItem="qTP-cz-e7c" secondAttribute="bottom" constant="8" id="3qJ-rF-DIq"/>
                             <constraint firstItem="qTP-cz-e7c" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="G1e-Do-qYM"/>
+                            <constraint firstItem="ks2-7s-P1b" firstAttribute="top" secondItem="NYg-WZ-voC" secondAttribute="bottom" constant="8" id="G5y-XS-0a8"/>
                             <constraint firstItem="ks2-7s-P1b" firstAttribute="leading" secondItem="TpU-gO-2f1" secondAttribute="leadingMargin" constant="8" id="H5Q-Ab-U8i"/>
                             <constraint firstItem="4S9-ye-HCm" firstAttribute="top" secondItem="7DK-eI-Wgp" secondAttribute="bottom" constant="8" id="NtI-5C-7xr"/>
-                            <constraint firstItem="ks2-7s-P1b" firstAttribute="top" secondItem="4S9-ye-HCm" secondAttribute="bottom" constant="8" id="WHg-gA-Be1"/>
+                            <constraint firstItem="NYg-WZ-voC" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="OKc-6C-Hjx"/>
+                            <constraint firstItem="NYg-WZ-voC" firstAttribute="top" secondItem="4S9-ye-HCm" secondAttribute="bottom" constant="8" id="Z7m-hl-Y3z"/>
                             <constraint firstItem="qTP-cz-e7c" firstAttribute="top" secondItem="TDM-SW-5Bv" secondAttribute="bottom" constant="8" id="biG-jU-J9y"/>
                             <constraint firstItem="4S9-ye-HCm" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="bjQ-uW-IGP"/>
                             <constraint firstItem="7DK-eI-Wgp" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="iwx-gH-uGM"/>
@@ -80,6 +89,7 @@
                     <connections>
                         <outlet property="basicLoopButton" destination="TDM-SW-5Bv" id="u43-ag-KZl"/>
                         <outlet property="duckButton" destination="7DK-eI-Wgp" id="9fI-mL-dTY"/>
+                        <outlet property="fadeInNewTracksButton" destination="NYg-WZ-voC" id="tAs-EA-E26"/>
                         <outlet property="introLoopButton" destination="qTP-cz-e7c" id="Lzl-Au-Krh"/>
                         <outlet property="muteButton" destination="ggW-pd-Qp4" id="gOI-Wy-s4n"/>
                         <outlet property="pauseButton" destination="4S9-ye-HCm" id="9HC-fe-9qp"/>

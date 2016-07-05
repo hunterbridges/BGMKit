@@ -9,7 +9,7 @@
 #import "BGMTrackDefinition.h"
 
 static const size_t kOggBufferCount = 3;
-static const size_t kOggBufferFrameCapacity = 1024;
+static const size_t kOggBufferFrameCapacity = 1024 * 4;
 static const size_t kOggChannels = 2;
 static const size_t kOggBufferSize = kOggBufferFrameCapacity * kOggChannels * sizeof(Float32);
 static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float32);

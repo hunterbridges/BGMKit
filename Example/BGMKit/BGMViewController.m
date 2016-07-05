@@ -17,6 +17,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *muteButton;
 @property (strong, nonatomic) IBOutlet UIButton *duckButton;
 @property (strong, nonatomic) IBOutlet UIButton *pauseButton;
+@property (strong, nonatomic) IBOutlet UIButton *fadeInNewTracksButton;
 
 @property (nonatomic, strong) BGMTrackDefinition *basicLoopTrack;
 @property (nonatomic, strong) BGMTrackDefinition *introLoopTrack;
@@ -49,6 +50,7 @@
   self.muteButton.selected = manager.mute;
   self.duckButton.selected = manager.duck;
   self.pauseButton.selected = manager.paused;
+  self.fadeInNewTracksButton.selected = manager.fadeInNewTracks;
 }
 #pragma mark - IBActions
 
@@ -105,6 +107,12 @@
 - (IBAction)pausePressed:(id)sender {
   BGMManager *manager = [BGMManager sharedInstance];
   manager.paused = !manager.paused;
+  [self updateInterface];
+}
+
+- (IBAction)fadeInPressed:(id)sender {
+  BGMManager *manager = [BGMManager sharedInstance];
+  manager.fadeInNewTracks = !manager.fadeInNewTracks;
   [self updateInterface];
 }
 

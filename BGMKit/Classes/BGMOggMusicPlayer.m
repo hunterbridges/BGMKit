@@ -9,7 +9,7 @@
 #import "BGMTrackDefinition.h"
 
 static const size_t kOggBufferCount = 3;
-static const size_t kOggBufferFrameCapacity = 1024 * 4;
+static const size_t kOggBufferFrameCapacity = 1024 * 8;
 static const size_t kOggChannels = 2;
 static const size_t kOggBufferSize = kOggBufferFrameCapacity * kOggChannels * sizeof(Float32);
 static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float32);
@@ -419,7 +419,24 @@ void OutputBufferCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBuffer
   }
   
   if (self.eof) {
-    if (self.playedIntro) {
+    if (self.hasIntro) {
+      if (self.playedIntro) {
+        if (self.loop) {
+          // Loop
+          [self rewind:&_loop];
+          self.eof = NO;
+        } else {
+          // Song is over.
+          [self stop];
+          return 0;
+        }
+      } else {
+        // Move to loop
+        self.playedIntro = YES;
+        self.eof = NO;
+        bundle = &_loop;
+      }
+    } else {
       if (self.loop) {
         // Loop
         [self rewind:&_loop];
@@ -429,11 +446,6 @@ void OutputBufferCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBuffer
         [self stop];
         return 0;
       }
-    } else {
-      // Move to loop
-      self.playedIntro = YES;
-      self.eof = NO;
-      bundle = &_loop;
     }
   }
   

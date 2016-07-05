@@ -29,9 +29,9 @@ The fun and quirky way to play music in your app.
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'BGMKit/{Classes,include,Ogg,Vorbis}/**/*.{m,c}'
+  s.source_files = 'BGMKit/{Classes,include,Ogg,Vorbis}/**/*.{h,m,c}'
 
-  s.public_header_files = 'BGMKit/Classes/**/*.h'
-  s.private_header_files = 'BGMKit/{include,Vorbis}/*.h'
+# s.public_header_files = 'BGMKit/Classes/**/*.h'
+  s.private_header_files = 'BGMKit/{include,Vorbis}/**/*.h'
   s.frameworks = 'AVFoundation', 'AudioToolbox'
 end

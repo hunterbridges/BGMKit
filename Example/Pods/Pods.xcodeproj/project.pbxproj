@@ -342,7 +342,6 @@
 		C12A2BF71D28815A00AE8EC2 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = framing.c; path = Ogg/framing.c; sourceTree = "<group>"; };
 		C12A2BFE1D28824000AE8EC2 /* analysis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = analysis.c; path = Vorbis/analysis.c; sourceTree = "<group>"; };
 		C12A2BFF1D28824000AE8EC2 /* backends.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = backends.h; path = Vorbis/backends.h; sourceTree = "<group>"; };
-		C12A2C001D28824000AE8EC2 /* barkmel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = barkmel.c; path = Vorbis/barkmel.c; sourceTree = "<group>"; };
 		C12A2C011D28824000AE8EC2 /* bitrate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitrate.c; path = Vorbis/bitrate.c; sourceTree = "<group>"; };
 		C12A2C021D28824000AE8EC2 /* bitrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitrate.h; path = Vorbis/bitrate.h; sourceTree = "<group>"; };
 		C12A2C031D28824000AE8EC2 /* block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = block.c; path = Vorbis/block.c; sourceTree = "<group>"; };
@@ -394,7 +393,6 @@
 		C12A2C361D28824000AE8EC2 /* os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = os.h; path = Vorbis/os.h; sourceTree = "<group>"; };
 		C12A2C371D28824000AE8EC2 /* psy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psy.c; path = Vorbis/psy.c; sourceTree = "<group>"; };
 		C12A2C381D28824000AE8EC2 /* psy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = psy.h; path = Vorbis/psy.h; sourceTree = "<group>"; };
-		C12A2C391D28824000AE8EC2 /* psytune.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psytune.c; path = Vorbis/psytune.c; sourceTree = "<group>"; };
 		C12A2C3A1D28824000AE8EC2 /* registry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = registry.c; path = Vorbis/registry.c; sourceTree = "<group>"; };
 		C12A2C3B1D28824000AE8EC2 /* registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = registry.h; path = Vorbis/registry.h; sourceTree = "<group>"; };
 		C12A2C3C1D28824000AE8EC2 /* res0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = res0.c; path = Vorbis/res0.c; sourceTree = "<group>"; };
@@ -403,7 +401,6 @@
 		C12A2C3F1D28824000AE8EC2 /* smallft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = smallft.c; path = Vorbis/smallft.c; sourceTree = "<group>"; };
 		C12A2C401D28824000AE8EC2 /* smallft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smallft.h; path = Vorbis/smallft.h; sourceTree = "<group>"; };
 		C12A2C411D28824000AE8EC2 /* synthesis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = synthesis.c; path = Vorbis/synthesis.c; sourceTree = "<group>"; };
-		C12A2C421D28824000AE8EC2 /* tone.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tone.c; path = Vorbis/tone.c; sourceTree = "<group>"; };
 		C12A2C431D28824000AE8EC2 /* vorbisenc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vorbisenc.c; path = Vorbis/vorbisenc.c; sourceTree = "<group>"; };
 		C12A2C441D28824000AE8EC2 /* vorbisfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vorbisfile.c; path = Vorbis/vorbisfile.c; sourceTree = "<group>"; };
 		C12A2C451D28824000AE8EC2 /* window.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = window.c; path = Vorbis/window.c; sourceTree = "<group>"; };
@@ -757,7 +754,6 @@
 			children = (
 				C12A2BFE1D28824000AE8EC2 /* analysis.c */,
 				C12A2BFF1D28824000AE8EC2 /* backends.h */,
-				C12A2C001D28824000AE8EC2 /* barkmel.c */,
 				C12A2C011D28824000AE8EC2 /* bitrate.c */,
 				C12A2C021D28824000AE8EC2 /* bitrate.h */,
 				C12A2C031D28824000AE8EC2 /* block.c */,
@@ -788,7 +784,6 @@
 				C12A2C361D28824000AE8EC2 /* os.h */,
 				C12A2C371D28824000AE8EC2 /* psy.c */,
 				C12A2C381D28824000AE8EC2 /* psy.h */,
-				C12A2C391D28824000AE8EC2 /* psytune.c */,
 				C12A2C3A1D28824000AE8EC2 /* registry.c */,
 				C12A2C3B1D28824000AE8EC2 /* registry.h */,
 				C12A2C3C1D28824000AE8EC2 /* res0.c */,
@@ -797,7 +792,6 @@
 				C12A2C3F1D28824000AE8EC2 /* smallft.c */,
 				C12A2C401D28824000AE8EC2 /* smallft.h */,
 				C12A2C411D28824000AE8EC2 /* synthesis.c */,
-				C12A2C421D28824000AE8EC2 /* tone.c */,
 				C12A2C431D28824000AE8EC2 /* vorbisenc.c */,
 				C12A2C441D28824000AE8EC2 /* vorbisfile.c */,
 				C12A2C451D28824000AE8EC2 /* window.c */,

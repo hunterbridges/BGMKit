@@ -32,8 +32,8 @@
   BGMTrackDefinition *goodVibes = [[BGMTrackDefinition alloc] initWithLoopName:@"GoodVibes"];
   self.basicLoopTrack = goodVibes;
   
-  BGMTrackDefinition *finalBoss = [[BGMTrackDefinition alloc] initWithIntroName:@"FinalBoss_Intro"
-                                                                       loopName:@"FinalBoss_Loop"];
+  BGMTrackDefinition *finalBoss = [[BGMTrackDefinition alloc] initWithIntroName:@"TakeYouForARide_Intro"
+                                                                       loopName:@"TakeYouForARide_Loop"];
   finalBoss.baseVolume = 0.5; // This track is loud af lol
   self.introLoopTrack = finalBoss;
 }

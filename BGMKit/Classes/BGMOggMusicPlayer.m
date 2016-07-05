@@ -28,8 +28,6 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
   
   AudioQueueRef _outputQueue;
   AudioQueueBufferRef _buffers[kOggBufferCount];
-  int _nextBufferToFill;
-  int _enqueuedBufferCount;
 }
 
 @property (nonatomic, copy, readwrite) NSString *oggName;
@@ -94,8 +92,6 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
   
   self.queueCount = 0;
   
-  _enqueuedBufferCount = 0;
-  _nextBufferToFill = 0;
   for (int i=0; i < kOggBufferCount; i++) {
     _buffers[i] = NULL;
   }
@@ -271,16 +267,13 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   OSStatus err;
   if (self.isPlaying == YES) {
     [self.outputLock lock];
-    // if (_enqueuedBufferCount < kOggBufferCount) {
-    //   [self enqueueNextBuffer:&sz];
-    // }
     size_t sz = 0;
     [self fillBuffer:buffer outSize:&sz];
     err = AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
     if (err == 560030580) { // Queue is not active due to Music being started or other reasons
       self.isPlaying = NO;
     } else if (err == noErr) {
-      _enqueuedBufferCount++;
+      // OK
     } else {
       NSLog(@"AudioQueueEnqueueBuffer() error %d", err);
     }
@@ -325,8 +318,6 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
     _outputQueue = outputQueue;
     
     // Enqueue buffers
-    _enqueuedBufferCount = 0;
-    _nextBufferToFill = 0;
     for (int i=0; i < kOggBufferCount; i++) {
       err = AudioQueueAllocateBufferWithPacketDescriptions(outputQueue, kOggBufferSize, kOggBufferFrameCapacity, &_buffers[i]);
       if (err == noErr) {
@@ -351,12 +342,6 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
 
 - (OSStatus)fillBuffer:(AudioQueueBufferRef)buffer outSize:(size_t *)sz
 {
-  // Is this doing anything?
-  int bufferIndex = _nextBufferToFill++;
-  if (_nextBufferToFill >= kOggBufferCount) {
-    _nextBufferToFill = 0;
-  }
-  
   // TODO handle more gracefully for intros and 1-shots
   if (self.eof) {
     [self rewind];
@@ -364,7 +349,7 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   }
   
   // Read out of OGG decoder
-  Float32 data[2][kOggBufferFrameCapacity];
+  Float32 data[kOggChannels][kOggBufferFrameCapacity];
   long chanFrames = kOggBufferFrameCapacity;
   int framesRead = 0;
   long result = 0;
@@ -375,11 +360,11 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
     
     if (result > 0) {
       for (int i = 0; i < result; i++) {
-        data[0][framesRead + i] = pcm[0][i];
-        data[1][framesRead + i] = pcm[1][i];
+        float l = pcm[0][i];
+        float r = pcm[1][i];
+        data[0][framesRead + i] = l;
+        data[1][framesRead + i] = r;
       }
-      // memcpy(data[0] + framesRead, pcm[0], result * sizeof(Float32));
-      // memcpy(data[1] + framesRead, pcm[1], result * sizeof(Float32));
       framesRead += result;
     } else {
       if (result < 0) {
@@ -398,23 +383,28 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
     return 0;
   }
   
+  size_t targetFrameCount = MIN(framesRead, kOggBufferFrameCapacity);
+  
   // Write new buffer
   memset(buffer->mAudioData, 0, kOggBufferSize);
   buffer->mPacketDescriptionCount = 0;
-  for (int i = 0; i < framesRead, i < kOggBufferFrameCapacity; i++) {
+  buffer->mAudioDataByteSize = 0;
+  for (int i = 0; i < targetFrameCount; i++) {
     Float32 l = data[0][i];
     Float32 r = data[1][i];
     Float32 *outBuf = (Float32 *)buffer->mAudioData;
-    outBuf[i * 2] = l;
-    outBuf[i * 2 + 1] = r;
-    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mStartOffset = sizeof(Float32) * i * 2;
+    
+    Float32 interleaved[kOggChannels] = {l, r};
+    memcpy(outBuf + i * kOggChannels, interleaved, sizeof(Float32) * kOggChannels);
+    
+    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mStartOffset = sizeof(Float32) * i * kOggChannels;
     buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mDataByteSize = sizeof(Float32) * kOggChannels;
-    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mVariableFramesInPacket = 1;
-    buffer->mAudioDataByteSize += sizeof(Float32) * kOggChannels;
-    buffer->mPacketDescriptionCount = i + 1;
+    buffer->mPacketDescriptions[buffer->mPacketDescriptionCount].mVariableFramesInPacket = 0;
+    buffer->mPacketDescriptionCount++;
   }
+  buffer->mAudioDataByteSize = sizeof(Float32) * kOggChannels * buffer->mPacketDescriptionCount;
   
-  if (buffer->mPacketDescriptionCount < kOggBufferFrameCapacity) {
+  if (framesRead < targetFrameCount) {
     NSLog(@"Exceeded buffer capacity with stream read left over. Uh oh!");
     [NSException raise:NSInternalInconsistencyException format:@"Exceeded buffer capacity with stream read left over. Uh oh!"];
     return -1;

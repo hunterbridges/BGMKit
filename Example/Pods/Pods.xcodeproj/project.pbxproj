@@ -161,7 +161,7 @@
 		C12A2C921D2887BC00AE8EC2 /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C3E1D28824000AE8EC2 /* sharedbook.c */; };
 		C12A2C931D2887C500AE8EC2 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2BF71D28815A00AE8EC2 /* framing.c */; };
 		C12A2C941D2887C800AE8EC2 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = C12A2BF61D28815A00AE8EC2 /* bitwise.c */; };
-		C12A2C971D2887F500AE8EC2 /* BGMOggMusicPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C951D2887F500AE8EC2 /* BGMOggMusicPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C12A2C971D2887F500AE8EC2 /* BGMOggMusicPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C951D2887F500AE8EC2 /* BGMOggMusicPlayer.h */; };
 		C12A2C981D2887F500AE8EC2 /* BGMOggMusicPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C961D2887F500AE8EC2 /* BGMOggMusicPlayer.m */; };
 		C12A2C9B1D2888A000AE8EC2 /* BGMManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C12A2C991D2888A000AE8EC2 /* BGMManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C12A2C9C1D2888A000AE8EC2 /* BGMManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C12A2C9A1D2888A000AE8EC2 /* BGMManager.m */; };

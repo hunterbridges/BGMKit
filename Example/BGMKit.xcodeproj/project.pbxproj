@@ -26,6 +26,8 @@
 		C12A2CA41D288C1B00AE8EC2 /* GoodVibes.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C12A2CA31D288C1B00AE8EC2 /* GoodVibes.ogg */; };
 		C12A2CA71D2893EA00AE8EC2 /* FinalBoss_Intro.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C12A2CA51D2893EA00AE8EC2 /* FinalBoss_Intro.ogg */; };
 		C12A2CA81D2893EA00AE8EC2 /* FinalBoss_Loop.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C12A2CA61D2893EA00AE8EC2 /* FinalBoss_Loop.ogg */; };
+		C16050121D2B321F00F4A34D /* TakeYouForARide_Intro.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C16050101D2B321F00F4A34D /* TakeYouForARide_Intro.ogg */; };
+		C16050131D2B321F00F4A34D /* TakeYouForARide_Loop.ogg in Resources */ = {isa = PBXBuildFile; fileRef = C16050111D2B321F00F4A34D /* TakeYouForARide_Loop.ogg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +70,8 @@
 		C12A2CA31D288C1B00AE8EC2 /* GoodVibes.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = GoodVibes.ogg; sourceTree = "<group>"; };
 		C12A2CA51D2893EA00AE8EC2 /* FinalBoss_Intro.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FinalBoss_Intro.ogg; sourceTree = "<group>"; };
 		C12A2CA61D2893EA00AE8EC2 /* FinalBoss_Loop.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FinalBoss_Loop.ogg; sourceTree = "<group>"; };
+		C16050101D2B321F00F4A34D /* TakeYouForARide_Intro.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = TakeYouForARide_Intro.ogg; sourceTree = "<group>"; };
+		C16050111D2B321F00F4A34D /* TakeYouForARide_Loop.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = TakeYouForARide_Loop.ogg; sourceTree = "<group>"; };
 		C3B14A0CA438C950F940A0D9 /* Pods_BGMKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BGMKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1670DF9898590F669774554 /* Pods-BGMKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BGMKit_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BGMKit_Example/Pods-BGMKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		FB0B30E8EF68BAAD5513DEB9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -162,6 +166,8 @@
 		6003F594195388D20070C39A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C16050101D2B321F00F4A34D /* TakeYouForARide_Intro.ogg */,
+				C16050111D2B321F00F4A34D /* TakeYouForARide_Loop.ogg */,
 				C12A2CA51D2893EA00AE8EC2 /* FinalBoss_Intro.ogg */,
 				C12A2CA61D2893EA00AE8EC2 /* FinalBoss_Loop.ogg */,
 				C12A2CA31D288C1B00AE8EC2 /* GoodVibes.ogg */,
@@ -285,7 +291,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C16050121D2B321F00F4A34D /* TakeYouForARide_Intro.ogg in Resources */,
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
+				C16050131D2B321F00F4A34D /* TakeYouForARide_Loop.ogg in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
 				C12A2CA41D288C1B00AE8EC2 /* GoodVibes.ogg in Resources */,
 				C12A2CA71D2893EA00AE8EC2 /* FinalBoss_Intro.ogg in Resources */,

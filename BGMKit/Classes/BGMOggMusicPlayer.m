@@ -308,30 +308,29 @@ typedef struct {
   AudioQueueSetParameter(_outputQueue, kAudioQueueParam_Volume, finalVolume);
 }
 
-// TODO: Migrate to AudioQueue
-void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
+void OutputBufferCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
   BGMOggMusicPlayer *player = (__bridge BGMOggMusicPlayer*) inUserData;
   [player processOutputBuffer:inBuffer queue:inAQ];
 }
 
-- (void) processOutputBuffer:(AudioQueueBufferRef)buffer queue:(AudioQueueRef)queue {
+- (void)processOutputBuffer:(AudioQueueBufferRef)buffer queue:(AudioQueueRef)queue {
   OSStatus err;
   if (self.isPlaying == YES) {
     [self.outputLock lock];
     size_t sz = 0;
     [self fillBuffer:buffer outSize:&sz];
     err = AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
-    if (err == 560030580) { // Queue is not active due to Music being started or other reasons
+    if (err == 560030580) {
+      // Queue is not active due to Music being started or other reasons
       self.isPlaying = NO;
+      
+      // NOTE: This may put music player into a weird state. Investigate.
     } else if (err == noErr) {
       // OK
     } else {
       NSLog(@"AudioQueueEnqueueBuffer() error %d", err);
     }
     [self.outputLock unlock];
-  } else {
-    // err = AudioQueueStop (queue, NO);
-    // if (err != noErr) NSLog(@"AudioQueueStop() error: %d", err);
   }
 }
 
@@ -364,7 +363,7 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   if (self.isPlaying == NO) {
     self.isPlaying = YES;
     AudioQueueRef outputQueue = NULL;
-    err = AudioQueueNewOutput (&streamFormat, AudioEngineOutputBufferCallback, (__bridge void *)self, nil, nil, 0, &outputQueue);
+    err = AudioQueueNewOutput (&streamFormat, OutputBufferCallback, (__bridge void *)self, nil, nil, 0, &outputQueue);
     if (err != noErr) NSLog(@"AudioQueueNewOutput() error: %d", err);
     _outputQueue = outputQueue;
     
@@ -374,7 +373,7 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
     for (int i=0; i < kOggBufferCount; i++) {
       err = AudioQueueAllocateBufferWithPacketDescriptions(outputQueue, kOggBufferSize, kOggBufferFrameCapacity, &_buffers[i]);
       if (err == noErr) {
-        AudioEngineOutputBufferCallback((__bridge void *)self, outputQueue, _buffers[i]);
+        OutputBufferCallback((__bridge void *)self, outputQueue, _buffers[i]);
       } else {
         NSLog(@"AudioQueueAllocateBuffer() error: %d", err);
         return;

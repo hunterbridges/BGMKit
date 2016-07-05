@@ -13,6 +13,7 @@
 @property (nonatomic, strong, readonly) BGMTrackDefinition *trackDefinition;
 @property (nonatomic, readonly) BOOL loop;
 @property (atomic, readonly) BOOL isPlaying;
+@property (atomic, readonly) BOOL isPaused;
 @property (nonatomic, assign) float volume;
 @property (nonatomic, assign) float volCoef;
 

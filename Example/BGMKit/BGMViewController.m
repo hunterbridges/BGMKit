@@ -16,6 +16,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *introLoopButton;
 @property (strong, nonatomic) IBOutlet UIButton *muteButton;
 @property (strong, nonatomic) IBOutlet UIButton *duckButton;
+@property (strong, nonatomic) IBOutlet UIButton *pauseButton;
 
 @property (nonatomic, strong) BGMTrackDefinition *basicLoopTrack;
 @property (nonatomic, strong) BGMTrackDefinition *introLoopTrack;
@@ -43,10 +44,11 @@
 - (void)updateInterface
 {
   BGMManager *manager = [BGMManager sharedInstance];
-  self.basicLoopButton.selected = manager.isPlaying && manager.currentTrack == self.basicLoopTrack;
-  self.introLoopButton.selected = manager.isPlaying && manager.currentTrack == self.introLoopTrack;
+  self.basicLoopButton.selected = manager.currentTrack == self.basicLoopTrack;
+  self.introLoopButton.selected = manager.currentTrack == self.introLoopTrack;
   self.muteButton.selected = manager.mute;
   self.duckButton.selected = manager.duck;
+  self.pauseButton.selected = manager.paused;
 }
 #pragma mark - IBActions
 
@@ -97,6 +99,12 @@
 - (IBAction)duckPressed:(id)sender {
   BGMManager *manager = [BGMManager sharedInstance];
   manager.duck = !manager.duck;
+  [self updateInterface];
+}
+
+- (IBAction)pausePressed:(id)sender {
+  BGMManager *manager = [BGMManager sharedInstance];
+  manager.paused = !manager.paused;
   [self updateInterface];
 }
 

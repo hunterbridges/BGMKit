@@ -25,6 +25,9 @@
 /// Whether to duck the currently playing music to the `duckingLevel`.
 @property (atomic, assign) BOOL duck;
 
+/// Set to YES to pause playback.
+@property (atomic, assign) BOOL paused;
+
 /// The level to duck music to. Defaults to 0.3.
 @property (nonatomic, assign) double duckingLevel;
 

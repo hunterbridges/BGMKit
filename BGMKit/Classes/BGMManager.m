@@ -10,6 +10,10 @@
 #import "BGMTrackDefinition.h"
 #import "BGMOggMusicPlayer.h"
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
+
 @interface BGMManager ()
 
 @property (nonatomic, readwrite) BGMTrackDefinition *currentTrack;
@@ -37,6 +41,17 @@
     self.mute = NO;
     self.duck = NO;
     self.duckingLevel = 0.3;
+    
+#if TARGET_OS_IPHONE
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleAppWillResignActive:)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleAppDidBecomeActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+#endif
   }
   return self;
 }
@@ -49,6 +64,7 @@
         [self.currentPlayer stop];
         self.currentPlayer = nil;
         self.currentTrack = nil;
+        self->_paused = NO;
         if (completion) {
           completion();
         }
@@ -73,6 +89,7 @@
       [self.currentPlayer stop];
       self.currentPlayer = nil;
       self.currentTrack = nil;
+      self->_paused = NO;
       [self play:toPlay completion:completion];
     }];
     return;
@@ -88,6 +105,7 @@
         withDuration:0.5
         completionBlock:nil];
   }
+  _paused = NO;
   [player play];
   if (completion) {
     completion();
@@ -125,6 +143,20 @@
   }
 }
 
+- (void)setPaused:(BOOL)paused
+{
+  if (!self.currentPlayer) {
+    return;
+  }
+  
+  _paused = paused;
+  if (paused) {
+    [self.currentPlayer pause];
+  } else {
+    [self.currentPlayer play];
+  }
+}
+
 - (void)setDuckingLevel:(double)duckingLevel
 {
   _duckingLevel = duckingLevel;
@@ -146,7 +178,18 @@
   } else {
     self.currentPlayer.volume = self.masterVolume * self.currentTrack.baseVolume;
   }
-  
+}
+
+#pragma mark - Notification Handlers
+
+- (void)handleAppWillResignActive:(NSNotification *)note
+{
+  self.paused = YES;
+}
+
+- (void)handleAppDidBecomeActive:(NSNotification *)note
+{
+  self.paused = NO;
 }
 
 @end

@@ -9,7 +9,7 @@
 #import "BGMTrackDefinition.h"
 
 static const size_t kOggBufferCount = 3;
-static const size_t kOggBufferFrameCapacity = 1024 * 32;
+static const size_t kOggBufferFrameCapacity = 1024;
 static const size_t kOggChannels = 2;
 static const size_t kOggBufferSize = kOggBufferFrameCapacity * kOggChannels * sizeof(Float32);
 static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float32);
@@ -111,6 +111,11 @@ typedef struct {
   return !!self.trackDefinition.introName;
 }
 
+- (BOOL)isPaused
+{
+  return self.initialized && !self.isPlaying;
+}
+
 - (void)setVolume:(float)volume
 {
   _volume = volume;
@@ -127,7 +132,15 @@ typedef struct {
 
 - (void)play
 {
-  if (!self.initialized) {
+  if (self.initialized) {
+    if (self.isPlaying) {
+      return;
+    }
+    
+    if (!self.isPlaying && !!_outputQueue) {
+      AudioQueueStart(_outputQueue, NULL);
+    }
+  } else {
     [self initialize];
   }
 }
@@ -138,14 +151,14 @@ typedef struct {
     return;
   }
   
-  AudioQueueStop(_outputQueue, false);
+  AudioQueueStop(_outputQueue, true);
   
   self.queueCount = 0;
   
   for (int i=0; i < kOggBufferCount; i++) {
     _buffers[i] = NULL;
   }
-  AudioQueueDispose(_outputQueue, false);
+  AudioQueueDispose(_outputQueue, true);
   _outputQueue = NULL;
   
   [self closeDecoder:&_intro];
@@ -157,6 +170,10 @@ typedef struct {
 
 - (void)pause
 {
+  if (!self.isPlaying) {
+    return;
+  }
+  AudioQueuePause(_outputQueue);
   self.isPlaying = NO;
 }
 

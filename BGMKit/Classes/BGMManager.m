@@ -72,7 +72,7 @@
     return;
   }
   
-  BGMOggMusicPlayer *player = [[BGMOggMusicPlayer alloc] initWithOGGNamed:toPlay.loopName];
+  BGMOggMusicPlayer *player = [[BGMOggMusicPlayer alloc] initWithTrackDefinition:toPlay];
   self.currentTrack = toPlay;
   self.currentPlayer = player;
   [self updatePlayerVolume];

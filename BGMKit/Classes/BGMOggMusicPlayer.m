@@ -6,6 +6,7 @@
 //
 
 #import "BGMOggMusicPlayer.h"
+#import "BGMTrackDefinition.h"
 
 static const size_t kOggBufferCount = 3;
 static const size_t kOggBufferFrameCapacity = 1024 * 32;
@@ -20,18 +21,23 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
 #include "vorbisenc.h"
 #include "vorbisfile.h"
 
+typedef struct {
+  BOOL initialized;
+  FILE *file;
+  OggVorbis_File stream;
+  vorbis_info *vorbisInfo;
+  vorbis_comment *vorbisComment;
+} OGGVorbisFileBundle;
+
 @interface BGMOggMusicPlayer () {
-  FILE *_file;
-  OggVorbis_File _stream;
-  vorbis_info *_vorbisInfo;
-  vorbis_comment *_vorbisComment;
+  OGGVorbisFileBundle _intro;
+  OGGVorbisFileBundle _loop;
   
   AudioQueueRef _outputQueue;
   AudioQueueBufferRef _buffers[kOggBufferCount];
 }
 
-@property (nonatomic, copy, readwrite) NSString *oggName;
-@property (nonatomic, copy, readwrite) NSString *oggPath;
+@property (nonatomic, copy, readwrite) BGMTrackDefinition *trackDefinition;
 @property (atomic, assign, readwrite) BOOL isPlaying;
 
 @property (nonatomic, assign) BOOL initialized;
@@ -48,32 +54,76 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
 @property (nonatomic, assign) float fadeDuration;
 @property (nonatomic, copy) void (^fadeCompletion)();
 
+@property (nonatomic, readonly) NSString *introPath;
+@property (nonatomic, readonly) NSString *loopPath;
+@property (nonatomic, readonly) BOOL hasIntro;
+@property (nonatomic, assign) BOOL playedIntro;
+
 @end
 
 @implementation BGMOggMusicPlayer
 
-- (id)initWithOGGNamed:(NSString *)name
+- (id)initWithTrackDefinition:(BGMTrackDefinition *)trackDefinition
 {
   self = [super init];
   if (self) {
-    NSString *path = [[NSBundle mainBundle] pathForResource:name ofType:@"ogg"];
-    if (path == nil) {
-      [NSException raise:NSInvalidArgumentException format:@"OGG file not found: %@", name, nil];
-      return nil;
-    }
-    
-    self.oggName = name;
-    self.oggPath = path;
+    self.trackDefinition = trackDefinition;
     self.volume = 1.f;
     self.volCoef = 1.f;
   }
   return self;
 }
 
+- (NSString *)pathForOGGNamed:(NSString *)name
+{
+  if (!name) {
+    return nil;
+  }
+  NSString *path = [[NSBundle mainBundle] pathForResource:name ofType:@"ogg"];
+  if (path == nil) {
+    [NSException raise:NSInvalidArgumentException format:@"OGG file not found: %@", self.trackDefinition.introName, nil];
+    return nil;
+  }
+  return path;
+}
+
 - (void)dealloc
 {
-  
+  if (self.isPlaying) {
+    [self stop];
+  }
 }
+
+#pragma mark - Accessors
+
+- (NSString *)introPath
+{
+  return [self pathForOGGNamed:self.trackDefinition.introName];
+}
+
+- (NSString *)loopPath
+{
+  return [self pathForOGGNamed:self.trackDefinition.loopName];
+}
+
+- (BOOL)hasIntro
+{
+  return !!self.trackDefinition.introName;
+}
+
+- (void)setVolume:(float)volume
+{
+  _volume = volume;
+  [self updateVolume];
+}
+
+- (void)setVolCoef:(float)volCoef
+{
+  _volCoef = volCoef;
+  [self updateVolume];
+}
+
+#pragma mark - Public
 
 - (void)play
 {
@@ -98,7 +148,8 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
   AudioQueueDispose(_outputQueue, false);
   _outputQueue = NULL;
   
-  [self closeDecoder];
+  [self closeDecoder:&_intro];
+  [self closeDecoder:&_loop];
   
   self.initialized = NO;
   self.isPlaying = NO;
@@ -142,18 +193,6 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
 - (BOOL)loop
 {
   return YES;
-}
-
-- (void)setVolume:(float)volume
-{
-  _volume = volume;
-  [self updateVolume];
-}
-
-- (void)setVolCoef:(float)volCoef
-{
-  _volCoef = volCoef;
-  [self updateVolume];
 }
 
 #pragma mark - Private
@@ -203,30 +242,42 @@ static const size_t kOggChanBufferSize = kOggBufferFrameCapacity * sizeof(Float3
 
 #pragma mark - Stream Management
 
-- (void)openDecoder
+- (void)openDecoder:(OGGVorbisFileBundle *)bundle withPath:(NSString *)path
 {
-  int result = ov_open(_file, &_stream, NULL, 0);
+  if (bundle->initialized) {
+    return;
+  }
+  
+  const char *filename = [path cStringUsingEncoding:NSASCIIStringEncoding];
+  bundle->file = fopen(filename, "rb");
+  
+  int result = ov_open(bundle->file, &bundle->stream, NULL, 0);
   if (result < 0) {
     NSLog(@"Couldn't open OGG stream: %@", [self oggErrorString:result]);
     return;
   }
   
-  _vorbisInfo = ov_info(&_stream, -1);
-  _vorbisComment = ov_comment(&_stream, -1);
+  bundle->vorbisInfo = ov_info(&bundle->stream, -1);
+  bundle->vorbisComment = ov_comment(&bundle->stream, -1);
+  bundle->initialized = YES;
 }
 
-- (void)closeDecoder
+- (void)closeDecoder:(OGGVorbisFileBundle *)bundle
 {
-  ov_clear(&_stream);
-  memset(&_stream, 0, sizeof(OggVorbis_File));
+  if (!bundle->initialized) {
+    return;
+  }
   
-  _vorbisInfo = NULL;
-  _vorbisComment = NULL;
+  ov_clear(&bundle->stream);
+  memset(&bundle->stream, 0, sizeof(OggVorbis_File));
+  
+  bundle->vorbisInfo = NULL;
+  bundle->vorbisComment = NULL;
 }
 
-- (void)rewind
+- (void)rewind:(OGGVorbisFileBundle *)bundle
 {
-  ov_raw_seek(&_stream, 0);
+  ov_raw_seek(&bundle->stream, 0);
 }
 
 - (NSString *)oggErrorString:(long)code
@@ -306,9 +357,11 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   // Start queue
   self.outputLock = [[NSLock alloc] init];
   
-  const char *filename = [self.oggPath cStringUsingEncoding:NSASCIIStringEncoding];
-  _file = fopen(filename, "rb");
-  [self openDecoder];
+  if (self.hasIntro) {
+    [self openDecoder:&_intro withPath:self.introPath];
+  }
+  
+  [self openDecoder:&_loop withPath:self.loopPath];
   
   if (self.isPlaying == NO) {
     self.isPlaying = YES;
@@ -342,10 +395,30 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
 
 - (OSStatus)fillBuffer:(AudioQueueBufferRef)buffer outSize:(size_t *)sz
 {
-  // TODO handle more gracefully for intros and 1-shots
+  OGGVorbisFileBundle *bundle = NULL;
+  if (self.hasIntro && !self.playedIntro) {
+    bundle = &_intro;
+  } else {
+    bundle = &_loop;
+  }
+  
   if (self.eof) {
-    [self rewind];
-    self.eof = NO;
+    if (self.playedIntro) {
+      if (self.loop) {
+        // Loop
+        [self rewind:&_loop];
+        self.eof = NO;
+      } else {
+        // Song is over.
+        [self stop];
+        return 0;
+      }
+    } else {
+      // Move to loop
+      self.playedIntro = YES;
+      self.eof = NO;
+      bundle = &_loop;
+    }
   }
   
   // Read out of OGG decoder
@@ -356,7 +429,7 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   
   while (framesRead < kOggBufferFrameCapacity) {
     float **pcm;
-    result = ov_read_float(&_stream, &pcm, kOggBufferFrameCapacity - framesRead, 0);
+    result = ov_read_float(&bundle->stream, &pcm, kOggBufferFrameCapacity - framesRead, 0);
     
     if (result > 0) {
       for (int i = 0; i < result; i++) {

@@ -7,15 +7,16 @@
 
 #import <Foundation/Foundation.h>
 
+@class BGMTrackDefinition;
 @interface BGMOggMusicPlayer : NSObject
 
-@property (nonatomic, copy, readonly) NSString *oggName;
+@property (nonatomic, strong, readonly) BGMTrackDefinition *trackDefinition;
 @property (nonatomic, readonly) BOOL loop;
 @property (atomic, readonly) BOOL isPlaying;
 @property (nonatomic, assign) float volume;
 @property (nonatomic, assign) float volCoef;
 
-- (id)initWithOGGNamed:(NSString *)name;
+- (id)initWithTrackDefinition:(BGMTrackDefinition *)trackDefinition;
 
 - (void)play;
 - (void)stop;

@@ -352,8 +352,6 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
   streamFormat.mFramesPerPacket = 1;
   streamFormat.mReserved = 0;
   
-  [self updateVolume];
-  
   // Start queue
   self.outputLock = [[NSLock alloc] init];
   
@@ -370,6 +368,8 @@ void AudioEngineOutputBufferCallback(void *inUserData, AudioQueueRef inAQ, Audio
     if (err != noErr) NSLog(@"AudioQueueNewOutput() error: %d", err);
     _outputQueue = outputQueue;
     
+    [self updateVolume];
+  
     // Enqueue buffers
     for (int i=0; i < kOggBufferCount; i++) {
       err = AudioQueueAllocateBufferWithPacketDescriptions(outputQueue, kOggBufferSize, kOggBufferFrameCapacity, &_buffers[i]);

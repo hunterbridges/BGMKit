@@ -58,6 +58,7 @@ Another thing to note is that if you want intro pre-rolls, you will have to
 implement something custom with AudioQueue.
 
 **Pros**: Easy to implement basic loops, requires no third party decoder.
+
 **Cons**: Extremely large file size, becomes just as difficult to implement
           as other formats if more advanced sequences are required.
 
@@ -80,6 +81,7 @@ a [write-up](http://gamua.com/blog/2012/05/gapless-mp3-audio-on-ios/) explaining
 how he implemented the library.
 
 **Pros**: Small file sizes, requires no third party decoder.
+
 **Cons**: Incurs a large production workflow cost, requires a low-level
           AudioQueue-based implementation in order to loop seamlessly.
 
@@ -102,6 +104,7 @@ frame metadata could become out of sync with the music assets through the
 course of development.
 
 **Pros**: Small file sizes, requires no third party decoder.
+
 **Cons**: Incurs a large production workflow cost, requires a low-level
           AudioQueue-based implementation in order to loop seamlessly,
           metadata must be maintained alongside music assets.
@@ -125,6 +128,7 @@ Because it requires a third party decoder, OGG Vorbis is not compatible with
 AVAudioPlayer at all. Implementations using it must be created from scratch.
 
 **Pros**: Small file sizes, painless production workflow
+
 **Cons**: Requires third-party decoder, requires a low-level
           AudioQueue-based implementation.
 

@@ -181,7 +181,7 @@ So what have you got to lose? Try my pod.
 
 ## Author
 
-[Hunter Bridges](http//hunterbridges.com/)
+[Hunter Bridges](http://hunterbridges.com/)
 [@hunterbridges](https://twitter.com/hunterbridges)
 
 ---
